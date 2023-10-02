@@ -24,13 +24,14 @@ check_installed() {
 
 show_help() {
   cat <<EOF
-Shttr is the CLI client for Shell on the Shttr apps.
+Shttr CLI is the CLI client for Shell on the Shttr apps.
 On each run, shttr will check for an installed backend to use for new apps,
 and if one is not found, it will be installed automatically to '~/.local/share/shttr'.
 
 Usage:
-  shttr n [app-name] - Creates a new Shttr app and populates it with the demo page
+  shttr n [app name] - Creates a new Shttr app and populates it with the demo page
   shttr d - When run in the root directory of a Shttr app, syncs it to the server using rsync
+  shttr g page [page name] - Generates a new blank page named "page name." This creats the cgi-bin script, a barebones controller, and a blank model and view.
   shttr u - When run in the root directory of a Shttr app, updates the shttr installation bundled with that app
   shttr su - Updates the system installed Shttr backend
 
@@ -84,12 +85,42 @@ deploy_project() {
   $rsync_path -avz --delete cgi-bin ${ssh_credentials}:/usr/lib/
 }
 
-update_app_shttr() {
-  [ -f .shttr ] && shttr=1
-  if [ -z $shttr ]; then
-    echo "This doesn't appear to be a Shttr app! Make sure you run 'shttr u' in the root of your Shttr app."
+generate_asset() {
+  verify_shttr_app
+
+  case $1 in
+    page) generate_page $2;;
+    *) echo "Invalid generator! Make sure you choose one of the following: page";;
+  esac
+}
+
+generate_page() {
+  page=$1
+  if [ -z $page ]; then
+    echo "You need to enter a name for your new page."
     exit 1
   fi
+
+  echo "Generating page ${page}..."
+  cp ~/.local/share/shttr/cgi-bin/index.sh cgi-bin/${page}.sh
+  cat > shttr/app/controllers/${page}.sh <<EOF
+TITLE="${page}"
+export TITLE
+
+MODEL_DATA=\$(sh \${SHTTR_APP}/models/\${CONTROLLER})
+export MODEL_DATA
+
+sh \${SHTTR_APP}/views/\${CONTROLLER}
+EOF
+  touch shttr/app/models/${page}.sh
+  echo ". \${SHTTR_LIB}/esh\n\n" > shttr/app/views/${page}.sh
+  mkdir shttr/app/views/${page}
+  touch shttr/app/views/${page}/index.html
+  echo "Done!"
+}
+
+update_app_shttr() {
+  verify_shttr_app
 
   app_name=$(cat .shttr)
   echo "Updating Shttr backend for ${app_name}..."
@@ -99,8 +130,16 @@ update_app_shttr() {
 }
 
 update_system_shttr() {
-  echo "Updating Shttr backend..."
+  echo "Updating system installed Shttr backend..."
   cd ~/.local/share/shttr && git pull
+}
+
+verify_shttr_app() {
+  [ -f .shttr ] && shttr=1
+  if [ -z $shttr ]; then
+    echo "This doesn't appear to be a Shttr app! Make sure you run 'shttr u' in the root of your Shttr app."
+    exit 1
+  fi
 }
 
 splash
@@ -109,6 +148,7 @@ check_installed
 case $1 in
   n) create_project $2;;
   d) deploy_project;;
+  g) generate_asset $2 $3;;
   u) update_app_shttr;;
   su) update_system_shttr;;
   *) show_help;;
