@@ -1,0 +1,99 @@
+#!/bin/sh
+
+splash() {
+  cat <<EOF
+******************************
+*  ____  _     _   _         *
+* / ___|| |__ | |_| |_ _ __  *
+* \___ \| '_ \| __| __| '__| *
+*  ___) | | | | |_| |_| |    *
+* |____/|_| |_|\__|\__|_|    *
+*                            *
+******************************                          
+
+EOF
+}
+
+check_installed() {
+  [ -d ~/.local/share/shttr ] && installed=1
+  if [ -z $installed ]; then
+    echo "No Shttr framework installed! Installing latest Shttr framework now..."
+    install_framework
+  fi
+}
+
+show_help() {
+  cat <<EOF
+Shttr is the CLI client for Shell on the Shttr apps.
+On each run, shttr will check for an installed backend to use for new apps,
+and if one is not found, it will be installed automatically to '~/.local/share/shttr'.
+
+Usage:
+  shttr c [app-name] - Creates a new Shttr app and populates it with the demo page
+  shttr d - When run in the root directory of a Shttr app, syncs it to the server using rsync
+  shttr u - Updates the system installed Shttr backend
+
+EOF
+}
+
+install_framework() {
+  mkdir -p ~/.local/share
+  git clone https://github.com/calebstein1/sh-on-the-shttr.git ~/.local/share/shttr
+}
+
+create_project() {
+  if [ -z $1 ]; then
+    proj="shttr_$(date +%s)"
+  else
+    proj=$1
+  fi
+
+  if [ -e $proj ]; then
+    echo "Directory already exists!"
+    exit 1
+  fi
+
+  echo "Creating project directory ${proj}..."
+  mkdir $proj
+  echo "Copying Shttr app files into ${proj}..."
+  cp -r ~/.local/share/shttr/shttr $proj
+  cp -r ~/.local/share/shttr/cgi-bin $proj
+  echo "Creating Shttr config file..."
+  echo "user@example.com" > ${proj}/shttr-config
+  touch ${proj}/.shttr
+  echo "Done!"
+}
+
+deploy_project() {
+  ssh_credentials=$(cat ./shttr-config 2>/dev/null)
+  rsync_path=$(which rsync 2>/dev/null)
+
+  if [ -z $ssh_credentials ]; then
+    echo "No credentials found! Either this is not a Shttr project, or you deleted the shttr-config file.\nMake sure you're running 'shttr d' in the root of your project directory with a valid shttr-config."
+    exit 1
+  fi
+
+  if [ -z $rsync_path ]; then
+    echo "Rsync is not installed! Please install it and try again."
+    exit 1
+  fi
+
+  echo "Deploying app..."
+  $rsync_path -avz --delete --exclude=storage shttr ${ssh_credentials}:/var/www/
+  $rsync_path -avz --delete cgi-bin ${ssh_credentials}:/usr/lib/
+}
+
+update_shttr() {
+  echo "Updating Shttr backend..."
+  cd ~/.local/share/shttr && git pull
+}
+
+splash
+check_installed
+
+case $1 in
+  n) create_project $2;;
+  d) deploy_project;;
+  u) update_shttr;;
+  *) show_help;;
+esac
