@@ -29,7 +29,7 @@ On each run, shttr will check for an installed backend to use for new apps,
 and if one is not found, it will be installed automatically to '~/.local/share/shttr'.
 
 Usage:
-  shttr c [app-name] - Creates a new Shttr app and populates it with the demo page
+  shttr n [app-name] - Creates a new Shttr app and populates it with the demo page
   shttr d - When run in the root directory of a Shttr app, syncs it to the server using rsync
   shttr u - Updates the system installed Shttr backend
 
