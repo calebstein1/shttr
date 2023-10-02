@@ -87,7 +87,7 @@ deploy_project() {
 update_app_shttr() {
   [ -f .shttr ] && shttr=1
   if [ -z $shttr ]; then
-    echo "This doesn't appear to be a Shttr app! Make sure you run 'shttr -u' in the root of your Shttr app."
+    echo "This doesn't appear to be a Shttr app! Make sure you run 'shttr u' in the root of your Shttr app."
     exit 1
   fi
 
