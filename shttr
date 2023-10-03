@@ -82,7 +82,11 @@ compile_assets() {
       if [ -z $sassc_path ] ; then
         echo "sassc must be installed in order to compile scss files."
       else
-        $sassc_path ${sheet} >> shttr/app/assets/public/style.css
+        if [ "$(echo ${sheet##*/} | cut -c1)" = "_" ]; then
+          continue
+        else
+          $sassc_path ${sheet} >> shttr/app/assets/public/style.css
+        fi
       fi
     fi
   done
