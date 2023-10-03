@@ -73,7 +73,7 @@ compile_assets() {
   mkdir -p shttr/app/assets/public
   rm shttr/app/assets/public/*.css 2>/dev/null
 
-  sass_path=$(which sassc 2>/dev/null)
+  sassc_path=$(which sassc 2>/dev/null)
 
   for sheet in $(find shttr/app/assets/stylesheets); do
     if [ "${sheet#*.}" = "css" ]; then
