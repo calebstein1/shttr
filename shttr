@@ -73,16 +73,16 @@ compile_assets() {
   mkdir -p shttr/app/assets/public
   rm shttr/app/assets/public/*.css 2>/dev/null
 
-  sass_path=$(which sass 2>/dev/null)
+  sass_path=$(which sassc 2>/dev/null)
 
   for sheet in $(find shttr/app/assets/stylesheets); do
     if [ "${sheet#*.}" = "css" ]; then
       cat ${sheet} >> shttr/app/assets/public/style.css
     elif [ "${sheet#*.}" = "scss" ]; then
-      if [ -z $sass_path ] ; then
-        echo "Sass must be installed in order to compile scss files."
+      if [ -z $sassc_path ] ; then
+        echo "sassc must be installed in order to compile scss files."
       else
-        sass ${sheet} >> shttr/app/assets/public/style.css
+        $sassc_path ${sheet} >> shttr/app/assets/public/style.css
       fi
     fi
   done
