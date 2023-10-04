@@ -30,7 +30,7 @@ and if one is not found, it will be installed automatically to '~/.local/share/s
 
 Usage:
   shttr n [app name] - Creates a new Shttr app and populates it with the demo page.
-  shttr c - Compiles all stylesheets into one asset in the assets/public directory. If 'sass' is available in PATH, it automatically compiles all scss files to css.
+  shttr c - Compiles all stylesheets into one asset in the assets/public directory. If 'sassc' is available in PATH, it automatically compiles all scss files to css.
   shttr d - When run in the root directory of a Shttr app, precompiles all css and syncs the app to the server using rsync.
   shttr g page [page name] - Generates a new blank page named "page name." This creats the cgi-bin script, a barebones controller, and a blank model and view.
   shttr u - When run in the root directory of a Shttr app, updates the shttr installation bundled with that app.
