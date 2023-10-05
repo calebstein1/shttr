@@ -80,7 +80,7 @@ install_tailwind() {
   esac
   case "$(uname -m)" in
     x86_64) arch="x64";;
-    aarch64 | aarch64_be) arch="arm";;
+    aarch64 | aarch64_be) arch="arm64";;
   esac
   curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-${os}-${arch}
   chmod +x tailwindcss-${os}-${arch}
