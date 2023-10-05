@@ -29,7 +29,7 @@ On each run, shttr will check for an installed backend to use for new apps,
 and if one is not found, it will be installed automatically to '~/.local/share/shttr'.
 
 Usage:
-  shttr n [app name] - Creates a new Shttr app and populates it with the demo page.
+  shttr n [app name] [--framework-option] - Creates a new Shttr app and populates it with the demo page.
   shttr c - Compiles all stylesheets into one asset in the assets/public directory. If 'sassc' is available in PATH, it automatically compiles all scss files to css.
   shttr d - When run in the root directory of a Shttr app, precompiles all css and syncs the app to the server using rsync.
   shttr g page [page name] - Generates a new blank page named "page name." This creats the cgi-bin script, a barebones controller, and a blank model and view.
@@ -64,31 +64,35 @@ create_project() {
   echo "Creating Shttr config file..."
   echo "user@example.com" > ${proj}/shttr-config
   echo "${proj}" > ${proj}/.shttr
-  if [ "$2" = "--tailwind" ]; then
-    rm -rf ${proj}/shttr/app/assets/stylesheets/vendored
-    echo "Downloading tailwind..."
-    mkdir ${proj}/tailwind
-    case "$(uname)" in
-      Linux) os="linux";;
-      Darwin) os="macos";;
-    esac
-    case "$(uname -m)" in
-      x86_64) arch="x64";;
-      aarch64 | aarch64_be) arch="arm";;
-    esac
-    curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-${os}-${arch}
-    chmod +x tailwindcss-${os}-${arch}
-    mv tailwindcss-${os}-${arch} ${proj}/tailwind/tailwind
-    ${proj}/tailwind/tailwind init ${proj}/tailwind/tailwind.config.js
-    sed -i 's|content: \[\]|content: \["./shttr/app/views/**/*.html"\]|' ${proj}/tailwind/tailwind.config.js
-    cat > ${proj}/tailwind/input.css <<EOF
+  case $2 in
+    --tailwind) install_tailwind;;
+  esac
+  echo "Done!"
+}
+
+install_tailwind() {
+  rm -rf ${proj}/shttr/app/assets/stylesheets/vendored
+  echo "Downloading tailwind..."
+  mkdir ${proj}/tailwind
+  case "$(uname)" in
+    Linux) os="linux";;
+    Darwin) os="macos";;
+  esac
+  case "$(uname -m)" in
+    x86_64) arch="x64";;
+    aarch64 | aarch64_be) arch="arm";;
+  esac
+  curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-${os}-${arch}
+  chmod +x tailwindcss-${os}-${arch}
+  mv tailwindcss-${os}-${arch} ${proj}/tailwind/tailwind
+  ${proj}/tailwind/tailwind init ${proj}/tailwind/tailwind.config.js
+  sed -i 's|content: \[\]|content: \["./shttr/app/views/**/*.html"\]|' ${proj}/tailwind/tailwind.config.js
+  cat > ${proj}/tailwind/input.css <<EOF
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 EOF
-    echo "Tailwind installed! Make sure you confirm that tailwind/tailwind.config.js looks good."
-  fi
-  echo "Done!"
+  echo "Tailwind installed! Make sure you confirm that tailwind/tailwind.config.js looks good."
 }
 
 compile_assets() {
