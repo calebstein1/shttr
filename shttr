@@ -66,13 +66,14 @@ create_project() {
   echo "${proj}" > ${proj}/.shttr
   case $2 in
     --tailwind) install_tailwind;;
+    --bootstrap) install_bootstrap;;
   esac
   echo "Done!"
 }
 
 install_tailwind() {
   rm -rf ${proj}/shttr/app/assets/stylesheets/vendored
-  echo "Downloading tailwind..."
+  echo "Downloading Tailwind..."
   mkdir ${proj}/tailwind
   case "$(uname)" in
     Linux) os="linux";;
@@ -83,6 +84,7 @@ install_tailwind() {
     aarch64 | aarch64_be) arch="arm64";;
   esac
   curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-${os}-${arch}
+  echo "Installing Tailwind..."
   chmod +x tailwindcss-${os}-${arch}
   mv tailwindcss-${os}-${arch} ${proj}/tailwind/tailwind
   ${proj}/tailwind/tailwind init ${proj}/tailwind/tailwind.config.js
@@ -93,6 +95,19 @@ install_tailwind() {
 @tailwind utilities;
 EOF
   echo "Tailwind installed! Make sure you confirm that tailwind/tailwind.config.js looks good."
+}
+
+install_bootstrap() {
+  bootstrap_ver="5.3.2"
+  rm -rf ${proj}/shttr/app/assets/stylesheets/vendored/*
+  echo "Downloading Bootstrap..."
+  curl -sLO https://github.com/twbs/bootstrap/releases/download/v${bootstrap_ver}/bootstrap-${bootstrap_ver}-dist.zip
+  echo "Installing Bootstrap..."
+  unzip -q bootstrap-${bootstrap_ver}-dist.zip
+  cp bootstrap-${bootstrap_ver}-dist/css/bootstrap.css ${proj}/shttr/app/assets/stylesheets/vendored/
+  cp bootstrap-${bootstrap_ver}-dist/js/bootstrap.bundle.js ${proj}/shttr/app/assets/scripts/vendored/
+  rm bootstrap-${bootstrap_ver}-dist.zip
+  rm -rf bootstrap-${bootstrap_ver}-dist
 }
 
 compile_assets() {
