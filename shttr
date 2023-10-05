@@ -64,6 +64,30 @@ create_project() {
   echo "Creating Shttr config file..."
   echo "user@example.com" > ${proj}/shttr-config
   echo "${proj}" > ${proj}/.shttr
+  if [ "$2" = "--tailwind" ]; then
+    rm -rf ${proj}/shttr/app/assets/stylesheets/vendored
+    echo "Downloading tailwind..."
+    mkdir ${proj}/tailwind
+    case "$(uname)" in
+      Linux) os="linux";;
+      Darwin) os="macos";;
+    esac
+    case "$(uname -m)" in
+      x86_64) arch="x64";;
+      aarch64 | aarch64_be) arch="arm";;
+    esac
+    curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-${os}-${arch}
+    chmod +x tailwindcss-${os}-${arch}
+    mv tailwindcss-${os}-${arch} ${proj}/tailwind/tailwind
+    ${proj}/tailwind/tailwind init ${proj}/tailwind/tailwind.config.js
+    sed -i 's|content: \[\]|content: \["./shttr/app/views/**/*.html"\]|' ${proj}/tailwind/tailwind.config.js
+    cat > ${proj}/tailwind/input.css <<EOF
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+EOF
+    echo "Tailwind installed! Make sure you confirm that tailwind/tailwind.config.js looks good."
+  fi
   echo "Done!"
 }
 
@@ -76,6 +100,8 @@ compile_assets() {
   sassc_path=$(which sassc 2>/dev/null)
 
   for sheet in $(find shttr/app/assets/stylesheets); do
+    [ -d "./tailwind" ] && tailwind/tailwind -c tailwind/tailwind.config.js -i tailwind/input.css -o shttr/app/assets/public/style.css
+
     if [ "${sheet#*.}" = "css" ]; then
       cat ${sheet} >> shttr/app/assets/public/style.css
     elif [ "${sheet#*.}" = "scss" ]; then
@@ -178,7 +204,7 @@ splash
 check_installed
 
 case $1 in
-  n) create_project $2;;
+  n) create_project $2 $3;;
   c) compile_assets;;
   d) deploy_project;;
   g) generate_asset $2 $3;;
