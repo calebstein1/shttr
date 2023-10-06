@@ -202,13 +202,24 @@ export MODEL_DATA
 sh \${SHTTR_APP}/views/\${CONTROLLER}
 EOF
   touch shttr/app/models/${page}.sh
-  cat > shttr/app/views/${page}.sh <<EOF
+  if [ -f shttr/app/views/shared/nav.html ]; then
+    cat > shttr/app/views/${page}.sh <<EOF
+. \${SHTTR_LIB}/esh
+
+v shared/app.html
+v shared/nav.html
+v ${page}/index.html
+v shared/btm.html
+EOF
+  else
+    cat > shttr/app/views/${page}.sh <<EOF
 . \${SHTTR_LIB}/esh
 
 v shared/app.html
 v ${page}/index.html
 v shared/btm.html
 EOF
+  fi
   mkdir shttr/app/views/${page}
   touch shttr/app/views/${page}/index.html
   echo "Done!"
