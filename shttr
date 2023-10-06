@@ -67,6 +67,7 @@ create_project() {
   case $2 in
     --tailwind) install_tailwind;;
     --bootstrap) install_bootstrap;;
+    --empty) empty_project;;
   esac
   echo "Done!"
 }
@@ -110,6 +111,12 @@ install_bootstrap() {
   rm -rf bootstrap-${bootstrap_ver}-dist
 }
 
+empty_project() {
+  rm -rf ${proj}/shttr/app/assets/stylesheets/vendored ${proj}/shttr/app/assets/public/* ${proj}/shttr/app/assets/images ${proj}/cgi-bin/* ${proj}/shttr/app/controllers/* ${proj}/shttr/app/models/* ${proj}/shttr/app/views/*
+  cp -r ~/.local/share/shttr/shttr/app/views/shared ${proj}/shttr/app/views
+  rm ${proj}/shttr/app/views/shared/nav.html
+}
+
 compile_assets() {
   verify_shttr_app
 
@@ -135,6 +142,8 @@ compile_assets() {
       fi
     fi
   done
+
+  [ -f shttr/app/assets/public/style.css ] || return
 
   compiled_css_digest=$(sha256sum shttr/app/assets/public/style.css | cut -d ' ' -f1)
   mv shttr/app/assets/public/style.css shttr/app/assets/public/style-${compiled_css_digest}.css
