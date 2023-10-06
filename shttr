@@ -73,7 +73,8 @@ create_project() {
 }
 
 install_tailwind() {
-  rm -rf ${proj}/shttr/app/assets/stylesheets/vendored
+  empty_project
+
   echo "Downloading Tailwind..."
   mkdir ${proj}/tailwind
   case "$(uname)" in
@@ -99,8 +100,10 @@ EOF
 }
 
 install_bootstrap() {
+  empty_project
+  mkdir ${proj}/shttr/app/assets/stylesheets/vendored
+
   bootstrap_ver="5.3.2"
-  rm -rf ${proj}/shttr/app/assets/stylesheets/vendored/*
   echo "Downloading Bootstrap..."
   curl -sLO https://github.com/twbs/bootstrap/releases/download/v${bootstrap_ver}/bootstrap-${bootstrap_ver}-dist.zip
   echo "Installing Bootstrap..."
