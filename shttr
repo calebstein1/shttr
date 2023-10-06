@@ -154,6 +154,18 @@ compile_assets() {
   echo "Stylesheets compiled successfully!"
 }
 
+init_db() {
+  ssh_credentials=$(cat ./shttr-config 2>/dev/null)
+  if [ -z $ssh_credentials ]; then
+    echo "No credentials found! Either this is not a Shttr app, or you deleted the shttr-config file.\nMake sure you're running 'shttr db:init' in the root of your app directory with a valid shttr-config."
+    exit 1
+  fi
+
+  echo "Initializing shttrdb on server..."
+  ssh $ssh_credentials "mkdir -p /var/shttrdb && chown www-data:www-data /var/shttrdb"
+  echo "Done!"
+}
+
 deploy_project() {
   ssh_credentials=$(cat ./shttr-config 2>/dev/null)
   rsync_path=$(which rsync 2>/dev/null)
@@ -255,6 +267,7 @@ case $1 in
   n) create_project $2 $3;;
   c) compile_assets;;
   d) deploy_project;;
+  db:init) init_db;;
   g) generate_asset $2 $3;;
   u) update_app_shttr;;
   su) update_system_shttr;;
