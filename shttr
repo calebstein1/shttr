@@ -202,7 +202,13 @@ export MODEL_DATA
 sh \${SHTTR_APP}/views/\${CONTROLLER}
 EOF
   touch shttr/app/models/${page}.sh
-  echo ". \${SHTTR_LIB}/esh\n\n" > shttr/app/views/${page}.sh
+  cat > shttr/app/views/${page}.sh <<EOF
+. \${SHTTR_LIB}/esh
+
+v shared/app.html
+v ${page}/index.html
+v shared/btm.html
+EOF
   mkdir shttr/app/views/${page}
   touch shttr/app/views/${page}/index.html
   echo "Done!"
