@@ -79,27 +79,18 @@ create_project() {
 install_tailwind() {
   empty_project
 
-  echo "Downloading Tailwind..."
-  mkdir ${proj}/tailwind
-  case "$(uname)" in
-    Linux) os="linux";;
-    Darwin) os="macos";;
-  esac
-  case "$(uname -m)" in
-    x86_64) arch="x64";;
-    aarch64 | aarch64_be) arch="arm64";;
-  esac
-  curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-${os}-${arch}
   echo "Installing Tailwind..."
-  chmod +x tailwindcss-${os}-${arch}
-  mv tailwindcss-${os}-${arch} ${proj}/tailwind/tailwind
-  ${proj}/tailwind/tailwind init ${proj}/tailwind/tailwind.config.js
-  sed -i 's|content: \[\]|content: \["./shttr/app/views/**/*.html"\]|' ${proj}/tailwind/tailwind.config.js
-  cat > ${proj}/tailwind/input.css <<EOF
+  cd ${proj}
+  npm install tailwindcss
+  mkdir tailwind
+  npx tailwindcss init tailwind/tailwind.config.js
+  sed -i 's|content: \[\]|content: \["./shttr/app/views/**/*.html"\]|' tailwind/tailwind.config.js
+  cat > tailwind/input.css <<EOF
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 EOF
+  cd ..
   echo "Tailwind installed! Make sure you confirm that tailwind/tailwind.config.js looks good."
 }
 
@@ -140,9 +131,8 @@ compile_assets() {
   mkdir -p shttr/app/assets/public
   rm shttr/app/assets/public/*.css 2>/dev/null
 
+  [ -d "./tailwind" ] && npx tailwindcss -c tailwind/tailwind.config.js -i tailwind/input.css -o shttr/app/assets/public/style.css
   for sheet in $(find shttr/app/assets/stylesheets); do
-    [ -d "./tailwind" ] && tailwind/tailwind -c tailwind/tailwind.config.js -i tailwind/input.css -o shttr/app/assets/public/style.css
-
     if [ "${sheet#*.}" = "css" ]; then
       cat ${sheet} >> shttr/app/assets/public/style.css
     elif [ "${sheet#*.}" = "scss" ]; then
