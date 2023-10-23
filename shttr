@@ -210,7 +210,7 @@ export TITLE
 . \${SHTTR_APP}/models/\${CONTROLLER}
 export MODEL_DATA
 
-sh \${SHTTR_APP}/views/\${CONTROLLER}
+. \${SHTTR_APP}/views/\${CONTROLLER}
 EOF
   touch shttr/app/models/${page}.sh
   if [ -f shttr/app/views/shared/nav.html ]; then
