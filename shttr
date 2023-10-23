@@ -208,7 +208,6 @@ TITLE="${page}"
 export TITLE
 
 . \${SHTTR_APP}/models/\${CONTROLLER}
-export MODEL_DATA
 
 . \${SHTTR_APP}/views/\${CONTROLLER}
 EOF
