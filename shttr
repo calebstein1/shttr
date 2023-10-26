@@ -235,6 +235,27 @@ EOF
   echo "Done!"
 }
 
+remove_asset() {
+  verify_shttr_app
+
+  case $1 in
+    page) remove_page $2;;
+    *) echo "Invalid generator! Make sure you choose one of the following: page";;
+  esac
+}
+
+remove_page() {
+  page=$1
+
+  echo "Removing page ${page}..."
+  [ -f cgi-bin/${page}.sh ] && rm cgi-bin/${page}.sh
+  [ -f shttr/app/controllers/${page}.sh ] && rm shttr/app/controllers/${page}.sh
+  [ -f shttr/app/models/${page}.sh ] && rm shttr/app/models/${page}.sh
+  [ -f shttr/app/views/${page}.sh ] && rm shttr/app/views/${page}.sh
+  [ -d shttr/app/views/${page} ] && rm shttr/app/views/${page}/* && rmdir shttr/app/views/${page}
+  echo "Done!"
+}
+
 update_app_shttr() {
   verify_shttr_app
 
@@ -267,6 +288,7 @@ case $1 in
   d | deploy) deploy_project $2;;
   db:init) init_db;;
   g | generate) generate_asset $2 $3;;
+  r | remove) remove_asset $2 $3;;
   u | update-app) update_app_shttr;;
   su | update-system) update_system_shttr;;
   *) show_help;;
