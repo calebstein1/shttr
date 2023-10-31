@@ -41,7 +41,7 @@ EOF
 
 install_framework() {
   mkdir -p ~/.local/share
-  git clone https://github.com/calebstein1/sh-on-the-shttr.git ~/.local/share/shttr
+  git clone https://git.calebstein.net/calebstein1/sh-on-the-shttr.git ~/.local/share/shttr
 }
 
 create_project() {
