@@ -214,7 +214,7 @@ EOF
   touch shttr/app/models/${page}.sh
   if [ -f shttr/app/views/shared/nav.html ]; then
     cat > shttr/app/views/${page}.sh <<EOF
-. \${SHTTR_LIB}/esh
+use esh
 
 v shared/app.html
 v shared/nav.html
