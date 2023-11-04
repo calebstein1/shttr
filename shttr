@@ -61,6 +61,8 @@ create_project() {
   echo "Copying Shttr app files into ${proj}..."
   cp -r ~/.local/share/shttr/shttr $proj
   cp -r ~/.local/share/shttr/cgi-bin $proj
+  cp ~/.local/share/shttr/.gitignore $proj
+  cp ~/.local/share/shttr/.gitattributes $proj
   echo "Creating Shttr config file..."
   echo "user@example.com" > ${proj}/shttr-config
   echo "${proj}" > ${proj}/.shttr
@@ -73,6 +75,11 @@ create_project() {
     --bootstrap) install_bootstrap;;
     --empty) empty_project;;
   esac
+  echo "Initializing git..."
+  cd $proj
+  git init
+  echo "# ${proj}" > README.md
+  cd ..
   echo "Done!"
 }
 
