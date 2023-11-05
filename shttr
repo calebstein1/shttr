@@ -188,7 +188,7 @@ deploy_project() {
 
   echo "Deploying app..."
   [ "$1" = "-c" ] && compile_assets
-  $rsync_path -avz --delete --exclude=storage shttr ${ssh_credentials}:/var/www/
+  $rsync_path -avz --delete shttr ${ssh_credentials}:/var/www/
   $rsync_path -avz --delete cgi-bin ${ssh_credentials}:/usr/lib/
 }
 
@@ -225,7 +225,7 @@ use esh
 
 v shared/app.html
 v shared/nav.html
-v ${page}/index.html
+v index.html
 v shared/btm.html
 EOF
   else
@@ -233,7 +233,7 @@ EOF
 . \${SHTTR_LIB}/esh
 
 v shared/app.html
-v ${page}/index.html
+v index.html
 v shared/btm.html
 EOF
   fi
