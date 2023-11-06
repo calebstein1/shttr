@@ -264,6 +264,14 @@ remove_page() {
   echo "Done!"
 }
 
+shttr_npm() {
+  echo "Installing npm packages..."
+  args="$@"
+  npm_cmd="${args#* }"
+
+  npm --prefix=shttr/app/assets ${npm_cmd}
+}
+
 update_app_shttr() {
   verify_shttr_app
 
@@ -271,6 +279,8 @@ update_app_shttr() {
   echo "Updating Shttr backend for ${app_name}..."
   cp -r ~/.local/share/shttr/shttr/bin ./shttr
   cp -r ~/.local/share/shttr/shttr/lib ./shttr
+  cp ~/.local/share/shttr/.gitignore ./
+  cp ~/.local/share/shttr/.gitattributes ./
   echo "Done! Make sure you update your app files to reflect any changes made by the new Shttr version."
 }
 
@@ -303,5 +313,6 @@ case $1 in
   r | remove) remove_asset $2 $3;;
   u | update-app) update_app_shttr;;
   su | update-system) update_system_shttr;;
+  npm) shttr_npm "$@";;
   *) show_help;;
 esac
