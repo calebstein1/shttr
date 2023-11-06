@@ -128,12 +128,15 @@ EOF
 
 empty_project() {
   rm -rf ${proj}/shttr/app/assets/stylesheets/vendored ${proj}/shttr/app/assets/public/* ${proj}/shttr/app/assets/images ${proj}/cgi-bin/* ${proj}/shttr/app/controllers/* ${proj}/shttr/app/models/* ${proj}/shttr/app/views/*
+  rm ${proj}/shttr/app/assets/package.json
   cp -r ~/.local/share/shttr/shttr/app/views/shared ${proj}/shttr/app/views
   rm ${proj}/shttr/app/views/shared/nav.html
 }
 
 compile_assets() {
   verify_shttr_app
+
+  npm i --prefix=shttr/app/assets
 
   mkdir -p shttr/app/assets/public
   rm shttr/app/assets/public/*.css 2>/dev/null
@@ -189,8 +192,9 @@ deploy_project() {
 
   echo "Deploying app..."
   [ "$1" = "-c" ] && compile_assets
-  $rsync_path -avz --delete shttr ${ssh_credentials}:/var/www/
+  $rsync_path -avz --delete --exclude=node_modules shttr ${ssh_credentials}:/var/www/
   $rsync_path -avz --delete cgi-bin ${ssh_credentials}:/usr/lib/
+  ssh ${ssh_credentials} npm i --prefix=/var/www/shttr/app/assets
 }
 
 generate_asset() {
@@ -265,6 +269,8 @@ remove_page() {
 }
 
 shttr_npm() {
+  verify_shttr_app
+
   echo "Installing npm packages..."
   args="$@"
   npm_cmd="${args#* }"
