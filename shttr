@@ -173,6 +173,7 @@ init_db() {
 }
 
 deploy_project() {
+  verify_shttr_app
   ssh_credentials=$(cat ./shttr-config 2>/dev/null)
   rsync_path=$(which rsync 2>/dev/null)
 
@@ -279,7 +280,11 @@ update_system_shttr() {
 }
 
 verify_shttr_app() {
-  [ -f .shttr ] && shttr=1
+  while [ -z $shttr ]; do
+    [ -f .shttr ] && shttr=1 && break
+    cd ..
+    [ "$PWD" = "/" ] && break
+  done
   if [ -z $shttr ]; then
     echo "This doesn't appear to be a Shttr app! Make sure you run this in the root of your Shttr app."
     exit 1
