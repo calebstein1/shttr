@@ -41,7 +41,7 @@ EOF
 
 install_framework() {
   mkdir -p ~/.local/share
-  git clone https://git.calebstein.net/calebstein1/sh-on-the-shttr.git ~/.local/share/shttr
+  git clone https://github.com/calebstein1/sh-on-the-shttr.git ~/.local/share/shttr
 }
 
 create_project() {
@@ -164,6 +164,7 @@ compile_assets() {
 }
 
 init_db() {
+  verify_shttr_app
   ssh_credentials=$(cat ./shttr-config 2>/dev/null)
   if [ -z $ssh_credentials ]; then
     echo "No credentials found! Either this is not a Shttr app, or you deleted the shttr-config file.\nMake sure you're running 'shttr db:init' in the root of your app directory with a valid shttr-config."
@@ -171,8 +172,46 @@ init_db() {
   fi
 
   echo "Initializing shttrdb on server..."
-  ssh -4 $ssh_credentials "mkdir -p /var/shttrdb && chown www-data:www-data /var/shttrdb"
+  ssh -4 $ssh_credentials "mkdir -p /var/shttrdb && chown -R www-data:www-data /var/shttrdb"
   echo "Done!"
+}
+
+pull_db() {
+  verify_shttr_app
+  ssh_credentials=$(cat ./shttr-config 2>/dev/null)
+  rsync_path=$(which rsync 2>/dev/null)
+  if [ -z $ssh_credentials ]; then
+    echo "No credentials found! Either this is not a Shttr app, or you deleted the shttr-config file.\nMake sure you're running 'shttr db:init' in the root of your app directory with a valid shttr-config."
+    exit 1
+  fi
+
+  if [ -z $rsync_path ]; then
+    echo "Rsync is not installed! Please install it and try again."
+    exit 1
+  fi
+
+  echo "Pulling DB from server..."
+  rsync -avz4 --delete ${ssh_credentials}:/var/shttrdb ./
+  echo "Done!"
+}
+
+push_db() {
+  verify_shttr_app
+  ssh_credentials=$(cat ./shttr-config 2>/dev/null)
+  rsync_path=$(which rsync 2>/dev/null)
+  if [ -z $ssh_credentials ]; then
+    echo "No credentials found! Either this is not a Shttr app, or you deleted the shttr-config file.\nMake sure you're running 'shttr db:init' in the root of your app directory with a valid shttr-config."
+    exit 1
+  fi
+
+  if [ -z $rsync_path ]; then
+    echo "Rsync is not installed! Please install it and try again."
+    exit 1
+  fi
+
+  echo "Pushing DB to server..."
+  rsync -avz4 --delete ./shttrdb ${ssh_credentials}:/var/
+  init_db
 }
 
 deploy_project() {
@@ -315,6 +354,8 @@ case $1 in
   c | compile) compile_assets;;
   d | deploy) deploy_project $2;;
   db:init) init_db;;
+  db:pull) pull_db;;
+  db:push) push_db;;
   g | generate) generate_asset $2 $3;;
   r | remove) remove_asset $2 $3;;
   u | update-app) update_app_shttr;;
