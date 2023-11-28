@@ -274,7 +274,7 @@ v shared/btm.html
 EOF
   else
     cat > shttr/app/views/${page}.sh <<EOF
-. \${SHTTR_LIB}/esh
+use esh
 
 v shared/app.html
 v index.html
