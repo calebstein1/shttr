@@ -1,0 +1,34 @@
+#!/bin/sh
+
+dbg_break() {
+  dbg_count=0
+  while [ "${dbg_cmd}" != "continue" ]; do
+    echo -n "shttr-dbg[${dbg_count}] > "
+    read dbg_cmd
+    eval "${dbg_cmd}"
+    dbg_count=$(( $dbg_count + 1 ))
+  done
+  dbg_cmd=""
+}
+
+DEBUG_MODE=1
+if [ "$2" ]; then
+  REQUEST_METHOD="POST"
+  QUERY_STRING="$2"
+else
+  REQUEST_METHOD="GET"
+fi
+
+SHTTR_BIN="${PWD}/shttr/bin"
+SHTTR_LIB="${PWD}/shttr/lib"
+SHTTR_APP="${PWD}/shttr/app"
+SHTTR_ASSETS="/app/assets"
+SCRIPT_FILENAME="${1}.sh"
+export REQUEST_METHOD
+export SHTTR_BIN
+export SHTTR_LIB
+export SHTTR_APP
+export SHTTR_ASSETS
+export SCRIPT_FILENAME
+
+. ${SHTTR_BIN}/shttr

@@ -317,6 +317,14 @@ shttr_npm() {
   npm --prefix=shttr/app/assets ${npm_cmd}
 }
 
+shttr_debug() {
+  verify_shttr_app
+  if [ "$2" = "--post" ]; then
+    data="$3"
+  fi
+  shttr-dbg $1 "$data"
+}
+
 update_app_shttr() {
   verify_shttr_app
 
@@ -361,5 +369,6 @@ case $1 in
   u | update-app) update_app_shttr;;
   su | update-system) update_system_shttr;;
   npm) shttr_npm "$@";;
+  debug) shttr_debug $2 $3 $4 ;;
   *) show_help;;
 esac
