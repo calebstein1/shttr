@@ -224,7 +224,11 @@ deploy_project() {
   echo "Building Docker image..."
   [ "$1" = "-c" ] && compile_assets
   docker build -t $(cat .shttr) .
-  zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
+  if [ =d .ebextensions ]; then
+    zip -r $(cat .shttr) shttr/ cgi-bin/ .ebextensions/ Dockerfile
+  else
+    zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
+  fi
 }
 
 generate_asset() {
