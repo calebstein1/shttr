@@ -30,10 +30,13 @@ and if one is not found, it will be installed automatically to '~/.local/share/s
 
 Usage:
   shttr (n)ew [app name] [--framework-option] - Creates a new Shttr app and populates it with the demo page.
-  shttr (c)ompile - Compiles all stylesheets into one asset in the assets/public directory.
-  shttr (d)eploy [-c] - When run in the root directory of a Shttr app, syncs the app to the server using rsync. The -c flag compiles the stylesheets prior to deploying.
+  shttr (c)ompile - Compiles all stylesheets into one asset in the assets/public directory, and installs all runtime npm packages.
+  shttr (d)eploy [-c] - Builds the app's Docker image and creates a zip file in the app's root directory. The -c flag compiles the stylesheets and makes sure all runtime npm packages are installed prior to deploying.
   shttr (g)enerate page [page name] - Generates a new blank page named "page name." This creats the cgi-bin script, a barebones controller, and a blank model and view.
-  shttr (u)pdate - When run in the root directory of a Shttr app, updates the shttr installation bundled with that app.
+  shttr (r)emove page [page name] - Deletes the cgi-bin script, model, view and controller associated with the page provided.
+  shttr (s)erver - Launces the development server. The server requires a Docker image to be built, so it's a good idea to run "shttr d" or "shttr d -c" prior to launching the server.
+  shttr debug [page name] - Runs through the page scripts in an environment that mimics the CGI environment of the live server, outputting the resulting HTML in plain text. It will automatically break on any instance of "dbg-break" and drop you into a shell at that point in execution, allowing you to inspect any variable present at that time.
+  shttr (u)pdate - Updates the shttr installation bundled with that app.
   shttr su - Updates the system installed Shttr backend.
 
 EOF
