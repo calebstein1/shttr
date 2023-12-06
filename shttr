@@ -221,14 +221,18 @@ push_db() {
 deploy_project() {
   verify_shttr_app
 
-  echo "Building Docker image..."
   [ "$1" = "-c" ] && compile_assets
-  docker build -t $(cat .shttr) .
-  if [ =d .ebextensions ]; then
+  build_image
+  if [ -d .ebextensions ]; then
     zip -r $(cat .shttr) shttr/ cgi-bin/ .ebextensions/ Dockerfile
   else
     zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
   fi
+}
+
+build_image() {
+  echo "Building Docker image..."
+  docker build -t $(cat .shttr) .
 }
 
 generate_asset() {
@@ -304,6 +308,7 @@ remove_page() {
 
 run_server() {
   verify_shttr_app
+  build_image
 
   echo "Starting server on localhost:3000\nCtrl+C to quit"
   docker run -p 3000:80 -v shttrdb:/var/shttrdb $(cat .shttr)
