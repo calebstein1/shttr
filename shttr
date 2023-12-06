@@ -311,7 +311,15 @@ run_server() {
   build_image
 
   echo "Image built!\n\nStarting server on localhost:3000\nCtrl+C to quit"
-  docker run -p 3000:80 -v shttrdb:/var/shttrdb $(cat .shttr)
+  if [ "$1" = "--production" ]; then
+    SERVER_TYPE="PRODUCTION"
+    echo "Server running in production mode"
+  else
+    SERVER_TYPE="DEVELOPMENT"
+    echo "Server running in development mode"
+  fi
+  export SERVER_TYPE
+  docker run -p 3000:80 -e SERVER_TYPE -v shttrdb:/var/shttrdb $(cat .shttr)
 }
 
 shttr_npm() {
@@ -374,7 +382,7 @@ case $1 in
   db:push) push_db;;
   g | generate) generate_asset $2 $3;;
   r | remove) remove_asset $2 $3;;
-  s | server) run_server;;
+  s | server) run_server $2;;
   u | update-app) update_app_shttr;;
   su | update-system) update_system_shttr;;
   npm) shttr_npm "$@";;
