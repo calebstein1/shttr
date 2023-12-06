@@ -1,4 +1,5 @@
 # :toilet: Shttr CLI :toilet:
+## The Blue Bag Update
 
 Shttr CLI is the CLI tool for managing your Shttr apps. Install by adding `shttr` and `shttr-dbg` to your $PATH.
 
