@@ -63,6 +63,7 @@ create_project() {
   cp -r ~/.local/share/shttr/cgi-bin $proj
   cp ~/.local/share/shttr/.gitignore $proj
   cp ~/.local/share/shttr/.gitattributes $proj
+  cp ~/.local/share/shttr/Dockerfile $proj
   echo "Creating Shttr config file..."
   echo "user@example.com" > ${proj}/shttr-config
   echo "${proj}" > ${proj}/.shttr
@@ -216,24 +217,11 @@ push_db() {
 
 deploy_project() {
   verify_shttr_app
-  ssh_credentials=$(cat ./shttr-config 2>/dev/null)
-  rsync_path=$(which rsync 2>/dev/null)
 
-  if [ -z $ssh_credentials ]; then
-    echo "No credentials found! Either this is not a Shttr app, or you deleted the shttr-config file.\nMake sure you're running 'shttr d' in the root of your app directory with a valid shttr-config."
-    exit 1
-  fi
-
-  if [ -z $rsync_path ]; then
-    echo "Rsync is not installed! Please install it and try again."
-    exit 1
-  fi
-
-  echo "Deploying app..."
+  echo "Building Docker image..."
   [ "$1" = "-c" ] && compile_assets
-  $rsync_path -avz4 --delete --exclude=node_modules shttr ${ssh_credentials}:/var/www/
-  $rsync_path -avz4 --delete cgi-bin ${ssh_credentials}:/usr/lib/
-  ssh -4 ${ssh_credentials} npm i --prefix=/var/www/shttr/app/assets
+  docker build -t $(cat .shttr) .
+  zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
 }
 
 generate_asset() {
@@ -307,6 +295,13 @@ remove_page() {
   echo "Done!"
 }
 
+run_server() {
+  verify_shttr_app
+
+  echo "Starting server on localhost:3000\nCtrl+C to quit"
+  docker run -p 3000:80 -v shttrdb:/var/shttrdb $(cat .shttr)
+}
+
 shttr_npm() {
   verify_shttr_app
 
@@ -334,6 +329,7 @@ update_app_shttr() {
   cp -r ~/.local/share/shttr/shttr/lib ./shttr
   cp ~/.local/share/shttr/.gitignore ./
   cp ~/.local/share/shttr/.gitattributes ./
+  cp ~/.local/share/shttr/Dockerfile ./
   echo "Done! Make sure you update your app files to reflect any changes made by the new Shttr version."
 }
 
@@ -366,6 +362,7 @@ case $1 in
   db:push) push_db;;
   g | generate) generate_asset $2 $3;;
   r | remove) remove_asset $2 $3;;
+  s | server) run_server;;
   u | update-app) update_app_shttr;;
   su | update-system) update_system_shttr;;
   npm) shttr_npm "$@";;
