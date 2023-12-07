@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/opt/SHTTR_APP_NAME/start-shttr.sh
-Type=notify
+Type=simple
 Restart=always
 
 [Install]
