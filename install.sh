@@ -30,5 +30,7 @@ echo "Installing Shttr CLI..."
 mv shttr /usr/local/bin
 mv shttr-dbg /usr/local/bin
 mv shttr-systemd /usr/local/share/shttr-cli
+chmod +x /usr/local/bin/shttr
+chmod +x /usr/local/bin/shttr-dbg
 
 echo "Shttr CLI installed successfully!"
