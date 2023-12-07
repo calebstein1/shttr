@@ -66,6 +66,7 @@ create_project() {
   cp -r ~/.local/share/shttr/cgi-bin $proj
   cp ~/.local/share/shttr/.gitignore $proj
   cp ~/.local/share/shttr/.gitattributes $proj
+  cp ~/.local/share/shttr/.startup $proj
   cp ~/.local/share/shttr/Dockerfile $proj
   echo "Creating Shttr config file..."
   echo "DEPLOYMENT_TARGET=\"systemd\"\n\nSSH_ADDRESS=\"user@example.com\"" > ${proj}/config.sh
@@ -372,6 +373,7 @@ update_app_shttr() {
   cp -r ~/.local/share/shttr/shttr/lib ./shttr
   cp ~/.local/share/shttr/.gitignore ./
   cp ~/.local/share/shttr/.gitattributes ./
+  cp ~/.local/share/shttr/.startup ./
   cp ~/.local/share/shttr/Dockerfile ./
   echo "Done! Make sure you update your app files to reflect any changes made by the new Shttr version."
 }
