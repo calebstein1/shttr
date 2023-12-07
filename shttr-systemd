@@ -1,0 +1,11 @@
+[Unit]
+Description=Shttr App
+After=network.target
+
+[Service]
+ExecStart=/opt/SHTTR_APP_NAME/start-shttr.sh
+Type=notify
+Restart=always
+
+[Install]
+WantedBy=default.target
