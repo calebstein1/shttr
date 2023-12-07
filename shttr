@@ -68,7 +68,7 @@ create_project() {
   cp ~/.local/share/shttr/.gitattributes $proj
   cp ~/.local/share/shttr/Dockerfile $proj
   echo "Creating Shttr config file..."
-  echo "user@example.com" > ${proj}/shttr-config
+  echo "DEPLOYMENT_TARGET=\"systemd\"\n\nSSH_ADDRESS=\"user@example.com\"" > ${proj}/config.sh
   echo "${proj}" > ${proj}/.shttr
   echo "Installing node packages..."
   cd $proj
@@ -220,13 +220,16 @@ push_db() {
 
 deploy_project() {
   verify_shttr_app
+  . ./config.sh
 
   [ "$1" = "-c" ] && compile_assets
   build_image
-  if [ -d .ebextensions ]; then
-    zip -r $(cat .shttr) shttr/ cgi-bin/ .ebextensions/ Dockerfile
-  else
-    zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
+  if [ "$DEPLOYMENT_TARGET" = "aws" ]; then
+    echo "Deploying to aws"
+    #zip -r $(cat .shttr) shttr/ cgi-bin/ .ebextensions/ Dockerfile
+  elif [ "$DEPLOYMENT_TARGET" = "systemd" ]; then
+    echo "Deploying to systemd"
+    #zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
   fi
 }
 
