@@ -225,11 +225,31 @@ deploy_project() {
   [ "$1" = "-c" ] && compile_assets
   build_image
   if [ "$DEPLOYMENT_TARGET" = "aws" ]; then
-    echo "Deploying to aws"
+    echo "Deploying to AWS is currently under development... as in, under-developed at the moment, it's coming soon, don't worry"
     #zip -r $(cat .shttr) shttr/ cgi-bin/ .ebextensions/ Dockerfile
   elif [ "$DEPLOYMENT_TARGET" = "systemd" ]; then
-    echo "Deploying to systemd"
-    #zip -r $(cat .shttr) shttr/ cgi-bin/ Dockerfile
+    echo "Deploying to systemd..."
+    sed "s/SHTTR_APP_NAME/$(cat .shttr)/" /usr/local/share/shttr-cli/shttr-systemd > $(cat .shttr).service
+    cat > start-shttr.sh <<EOF
+#!/bin/sh
+
+cd /opt/$(cat .shttr)
+shttr s --production
+EOF
+    chmod +x start-shttr.sh
+    ssh -4 ${SSH_ADDRESS} "mkdir -p /opt/$(cat .shttr)"
+    rsync -avz4 shttr ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 cgi-bin ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 .shttr ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 .startup ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 Dockerfile ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 start-shttr.sh ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 /usr/local/bin/shttr ${SSH_ADDRESS}:/usr/bin/
+    rsync -avz4 $(cat .shttr).service ${SSH_ADDRESS}:/etc/systemd/system/
+    ssh -4 ${SSH_ADDRESS} "systemctl enable $(cat .shttr).service && systemctl restart $(cat .shttr).service"
+    echo "App deployed as SystemD service to server! Make sure your reverse proxy is set up and pointing to port 3000\nCleaning files..."
+    rm $(cat .shttr).service
+    rm start-shttr.sh
   fi
 }
 
