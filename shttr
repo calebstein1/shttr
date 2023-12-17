@@ -334,7 +334,7 @@ run_server() {
   verify_shttr_app
   build_image
 
-  echo "Image built!\n\nStarting server on localhost:3000\nCtrl+C to quit"
+  echo "Image built!\n\nStarting server on http://localhost:3000\nCtrl+C to quit"
   if [ "$1" = "--production" ]; then
     SERVER_TYPE="PRODUCTION"
     echo "Server running in production mode"
