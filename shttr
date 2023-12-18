@@ -239,8 +239,8 @@ shttr s --production
 EOF
     chmod +x start-shttr.sh
     ssh -4 ${SSH_ADDRESS} "mkdir -p /opt/$(cat .shttr)"
-    rsync -avz4 shttr ${SSH_ADDRESS}:/opt/$(cat .shttr)/
-    rsync -avz4 cgi-bin ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 --delete shttr ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 --delete cgi-bin ${SSH_ADDRESS}:/opt/$(cat .shttr)/
     rsync -avz4 .shttr ${SSH_ADDRESS}:/opt/$(cat .shttr)/
     rsync -avz4 .startup ${SSH_ADDRESS}:/opt/$(cat .shttr)/
     rsync -avz4 Dockerfile ${SSH_ADDRESS}:/opt/$(cat .shttr)/
