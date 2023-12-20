@@ -243,7 +243,7 @@ EOF
     rsync -avz4 --delete cgi-bin ${SSH_ADDRESS}:/opt/$(cat .shttr)/
     rsync -avz4 .shttr ${SSH_ADDRESS}:/opt/$(cat .shttr)/
     rsync -avz4 .startup ${SSH_ADDRESS}:/opt/$(cat .shttr)/
-    rsync -avz4 Dockerfile ${SSH_ADDRESS}:/opt/$(cat .shttr)/
+    rsync -avz4 Dockerfile.prod ${SSH_ADDRESS}:/opt/$(cat .shttr)/Dockerfile
     rsync -avz4 start-shttr.sh ${SSH_ADDRESS}:/opt/$(cat .shttr)/
     rsync -avz4 /usr/local/bin/shttr ${SSH_ADDRESS}:/usr/bin/
     rsync -avz4 $(cat .shttr).service ${SSH_ADDRESS}:/etc/systemd/system/
@@ -332,18 +332,24 @@ remove_page() {
 
 run_server() {
   verify_shttr_app
-  build_image
+  [ -h ./Dockerfile ] && rm ./Dockerfile
 
-  echo "Image built!\n\nStarting server on http://localhost:3000\nCtrl+C to quit"
   if [ "$1" = "--production" ]; then
     SERVER_TYPE="PRODUCTION"
+    ln -s ./Dockerfile.prod ./Dockerfile
     echo "Server running in production mode"
   else
     SERVER_TYPE="DEVELOPMENT"
+    ln -s ./Dockerfile.dev ./Dockerfile
     echo "Server running in development mode"
+    DEV_ARGS="-v ./cgi-bin:/usr/local/apache2/cgi-bin -v ./shttr:/usr/local/apache2/htdocs"
   fi
   export SERVER_TYPE
-  docker run -p 3000:80 -e SERVER_TYPE -v shttrdb:/var/shttrdb $(cat .shttr)
+
+  build_image &&\
+  echo "Image built!\n\nStarting server on http://localhost:3000\nCtrl+C to quit"
+
+  docker run -p 3000:80 -e SERVER_TYPE -v shttrdb:/var/shttrdb ${DEV_ARGS} $(cat .shttr)
 }
 
 shttr_npm() {
