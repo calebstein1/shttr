@@ -67,7 +67,8 @@ create_project() {
   cp ~/.local/share/shttr/.gitignore $proj
   cp ~/.local/share/shttr/.gitattributes $proj
   cp ~/.local/share/shttr/.startup $proj
-  cp ~/.local/share/shttr/Dockerfile $proj
+  cp ~/.local/share/shttr/Dockerfile.dev $proj
+  cp ~/.local/share/shttr/Dockerfile.prod $proj
   echo "Creating Shttr config file..."
   echo "DEPLOYMENT_TARGET=\"systemd\"\n\nSSH_ADDRESS=\"user@example.com\"" > ${proj}/config.sh
   echo "${proj}" > ${proj}/.shttr
@@ -336,11 +337,11 @@ run_server() {
 
   if [ "$1" = "--production" ]; then
     SERVER_TYPE="PRODUCTION"
-    ln -s ./Dockerfile.prod ./Dockerfile
+    [ -f ./Dockerfile ] || ln -s ./Dockerfile.prod ./Dockerfile
     echo "Server running in production mode"
   else
     SERVER_TYPE="DEVELOPMENT"
-    ln -s ./Dockerfile.dev ./Dockerfile
+    [ -f ./Dockerfile ] || ln -s ./Dockerfile.dev ./Dockerfile
     echo "Server running in development mode"
     DEV_ARGS="-v ./cgi-bin:/usr/local/apache2/cgi-bin -v ./shttr:/usr/local/apache2/htdocs"
   fi
@@ -380,7 +381,8 @@ update_app_shttr() {
   cp ~/.local/share/shttr/.gitignore ./
   cp ~/.local/share/shttr/.gitattributes ./
   cp ~/.local/share/shttr/.startup ./
-  cp ~/.local/share/shttr/Dockerfile ./
+  cp ~/.local/share/shttr/Dockerfile.dev ./
+  cp ~/.local/share/shttr/Dockerfile.prod ./
   echo "Done! Make sure you update your app files to reflect any changes made by the new Shttr version."
 }
 
