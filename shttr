@@ -257,7 +257,7 @@ EOF
 
 build_image() {
   echo "Building Docker image..."
-  docker build -t $(cat .shttr) .
+  docker build -t $(cat .shttr | tr "[:upper:]" "[:lower:]") .
 }
 
 generate_asset() {
@@ -350,7 +350,7 @@ run_server() {
   build_image &&\
   echo "Image built!\n\nStarting server on http://localhost:3000\nCtrl+C to quit"
 
-  docker run -p 3000:80 -e SERVER_TYPE -v shttrdb:/var/shttrdb ${DEV_ARGS} $(cat .shttr)
+  docker run -p 3000:80 -e SERVER_TYPE -v shttrdb:/var/shttrdb ${DEV_ARGS} $(cat .shttr | tr "[:upper:]" "[:lower:]")
 }
 
 shttr_npm() {
