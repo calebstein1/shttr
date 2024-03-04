@@ -36,7 +36,6 @@ Usage:
   shttr (r)emove page [page name] - Deletes the cgi-bin script, model, view and controller associated with the page provided.
   shttr (s)erver - Launces the development server. The server requires a Docker image to be built, so it's a good idea to run "shttr d" or "shttr d -c" prior to launching the server.
   shttr debug [page name] - Runs through the page scripts in an environment that mimics the CGI environment of the live server, outputting the resulting HTML in plain text. It will automatically break on any instance of "dbg-break" and drop you into a shell at that point in execution, allowing you to inspect any variable present at that time.
-  shttr static - Compiles your Shttr site to static HTML, CSS, and Javascript. This is useful if you don't need to use Shttr's server-side functionality, but waht to use its templating to build your static site.
   shttr (u)pdate - Updates the shttr installation bundled with that app.
   shttr su - Updates the system installed Shttr backend.
 
@@ -226,11 +225,18 @@ deploy_project() {
   . ./config.sh
 
   [ "$1" = "-c" ] && compile_assets
-  build_image
   if [ "$DEPLOYMENT_TARGET" = "aws" ]; then
-    echo "Deploying to AWS is currently under development... as in, under-developed at the moment, it's coming soon, don't worry"
-    #zip -r $(cat .shttr) shttr/ cgi-bin/ .ebextensions/ Dockerfile
+    build_image
+    echo "Generating AWS Elastic Beanstalk Docker bundle..."
+    [ -h Dockerfile ] && rm Dockerfile
+    cp Dockerfile.prod Dockerfile
+    zip -r $(cat .shttr) shttr/ cgi-bin/ .startup Dockerfile
+    rm Dockerfile
+    echo "AWS Elastic Beanstalk Docker bundle generated!"
+  elif [ "$DEPLOYMENT_TARGET" = "static" ]; then
+      shttr_static
   elif [ "$DEPLOYMENT_TARGET" = "systemd" ]; then
+    build_image
     echo "Deploying to systemd..."
     sed "s/SHTTR_APP_NAME/$(cat .shttr)/" /usr/local/share/shttr-cli/shttr-systemd > $(cat .shttr).service
     cat > start-shttr.sh <<EOF
@@ -373,7 +379,6 @@ shttr_debug() {
 }
 
 shttr_static() {
-    verify_shttr_app
     echo "Compiling static site..."
     compile_assets
     mkdir -p static
@@ -433,6 +438,5 @@ case $1 in
   su | update-system) update_system_shttr;;
   npm) shttr_npm "$@";;
   debug) shttr_debug $2 $3 $4;;
-  static) shttr_static;;
   *) show_help;;
 esac
