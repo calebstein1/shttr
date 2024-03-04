@@ -380,7 +380,6 @@ shttr_debug() {
 
 shttr_static() {
     echo "Compiling static site..."
-    compile_assets
     mkdir -p static
     cp -r shttr/app/assets static/
     for page in $(find cgi-bin/ -type f -exec basename {} \;); do
