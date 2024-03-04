@@ -142,7 +142,7 @@ empty_project() {
 compile_assets() {
   verify_shttr_app
 
-  npm i --prefix=shttr/app/assets
+  [ -f shttr/app/assets/package.json ] && npm i --prefix=shttr/app/assets
 
   mkdir -p shttr/app/assets/public
   rm shttr/app/assets/public/*.css 2>/dev/null
