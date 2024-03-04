@@ -36,6 +36,7 @@ Usage:
   shttr (r)emove page [page name] - Deletes the cgi-bin script, model, view and controller associated with the page provided.
   shttr (s)erver - Launces the development server. The server requires a Docker image to be built, so it's a good idea to run "shttr d" or "shttr d -c" prior to launching the server.
   shttr debug [page name] - Runs through the page scripts in an environment that mimics the CGI environment of the live server, outputting the resulting HTML in plain text. It will automatically break on any instance of "dbg-break" and drop you into a shell at that point in execution, allowing you to inspect any variable present at that time.
+  shttr static - Compiles your Shttr site to static HTML, CSS, and Javascript. This is useful if you don't need to use Shttr's server-side functionality, but waht to use its templating to build your static site.
   shttr (u)pdate - Updates the shttr installation bundled with that app.
   shttr su - Updates the system installed Shttr backend.
 
@@ -371,6 +372,18 @@ shttr_debug() {
   shttr-dbg $1 "$data"
 }
 
+shttr_static() {
+    verify_shttr_app
+    echo "Compiling static site..."
+    compile_assets
+    mkdir -p static
+    cp -r shttr/app/assets static/
+    for page in $(find cgi-bin/ -type f -exec basename {} \;); do
+        shttr-static ${page%.sh}
+    done
+    echo "Compiled static site!"
+}
+
 update_app_shttr() {
   verify_shttr_app
 
@@ -419,6 +432,7 @@ case $1 in
   u | update-app) update_app_shttr;;
   su | update-system) update_system_shttr;;
   npm) shttr_npm "$@";;
-  debug) shttr_debug $2 $3 $4 ;;
+  debug) shttr_debug $2 $3 $4;;
+  static) shttr_static;;
   *) show_help;;
 esac

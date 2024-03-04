@@ -1,0 +1,15 @@
+#!/bin/sh
+
+SHTTR_BIN="${PWD}/shttr/bin"
+SHTTR_LIB="${PWD}/shttr/lib"
+SHTTR_APP="${PWD}/shttr/app"
+SHTTR_ASSETS="/assets"
+SCRIPT_FILENAME="${1}.sh"
+export REQUEST_METHOD
+export SHTTR_BIN
+export SHTTR_LIB
+export SHTTR_APP
+export SHTTR_ASSETS
+export SCRIPT_FILENAME
+
+. ${SHTTR_BIN}/shttr | sed 's|Content-Type: text/html|<!-- Generated with Shttr Static - https://shttr.io -->|;s|/cgi-bin||g;s|\.sh|\.html|g' > static/${1}.html
