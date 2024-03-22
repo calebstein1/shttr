@@ -70,7 +70,7 @@ create_project() {
   cp ~/.local/share/shttr/Dockerfile.dev $proj
   cp ~/.local/share/shttr/Dockerfile.prod $proj
   echo "Creating Shttr config file..."
-  echo "DEPLOYMENT_TARGET=\"systemd\"\n\nSSH_ADDRESS=\"user@example.com\"" > ${proj}/config.sh
+  echo "DEPLOYMENT_TARGET=\"static\"\n\nSSH_ADDRESS=\"user@example.com\"" > ${proj}/config.sh
   echo "${proj}" > ${proj}/.shttr
   echo "Installing node packages..."
   cd $proj
