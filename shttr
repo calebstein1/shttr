@@ -163,7 +163,7 @@ compile_assets() {
   [ -f shttr/app/assets/public/style.css ] || return
 
   npx postcss shttr/app/assets/public/style.css --use autoprefixer -r --no-map
-  compiled_css_digest=$(sha256sum shttr/app/assets/public/style.css | cut -d ' ' -f1)
+  compiled_css_digest=$(shasum -a 256 shttr/app/assets/public/style.css | cut -d ' ' -f1)
   mv shttr/app/assets/public/style.css shttr/app/assets/public/style-${compiled_css_digest}.css
 
   echo "Stylesheets compiled successfully!"
@@ -381,7 +381,7 @@ shttr_debug() {
 shttr_static() {
     echo "Compiling static site..."
     mkdir -p static
-    cp -r shttr/app/assets static/
+    rsync -a --delete shttr/app/assets static/
     for page in $(find cgi-bin/ -type f -exec basename {} \;); do
         shttr-static ${page%.sh}
     done
