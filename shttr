@@ -380,8 +380,8 @@ shttr_debug() {
 
 shttr_static() {
     echo "Compiling static site..."
-    mkdir -p static
-    rsync -a --delete shttr/app/assets static/
+    mkdir -p docs
+    rsync -a --delete shttr/app/assets docs/
     for page in $(find cgi-bin/ -type f -exec basename {} \;); do
         shttr-static ${page%.sh}
     done
